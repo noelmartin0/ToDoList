@@ -1,5 +1,10 @@
+html{
+  margin-bottom: 0%;
+  height: 100%;
+}
 body {
     background-color: #E8ECEF;
+    margin-bottom: 0%;
   }
   
   .centered {
@@ -12,4 +17,22 @@ body {
     font-size: 2rem;
     color: #fff;
     background-color: #000;
+  }
+
+  .heading{
+    color: #ebebec;
+    left: 960px;
+    text-align: center
+  }
+
+  .members {
+    font-size:  12pt;
+    color: #ebebec;
+  }
+
+  footer{
+    padding: 20pt 0 20pt;
+    left: 960px;
+    text-align: center;
+    background-color:  #202529;
   }

@@ -1,6 +1,8 @@
-// Two Schemas are used item and list
+//Database used ToDoListDB 
+//Collections used are User, List and Items
+//Used DBMS is MongoDB and connectivity used is mongoose
 
-//REQUIRED MODULES
+//REQUIRED NPM PACKAGES
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -10,9 +12,9 @@ const md5 = require('md5');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true })); 
-app.use(express.static("public"));
-app.set("view engine", "ejs");
-var currentUser;
+app.use(express.static("public")); //TO ACCESS CSS FILES FROM PUBLIC FOLDER
+app.set("view engine", "ejs"); //TO ACCESS EJS FILES FROM VIEW FOLDER
+
 //CONNECTING TO MONGO DB SERVER
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.DB_LINK, {
@@ -23,7 +25,7 @@ mongoose.connect(process.env.DB_LINK, {
 const itemSchema = {
   name: String
 };
-
+//model is similar to class concept
 const Item = mongoose.model("Item", itemSchema);
 
 const item1 = new Item({
@@ -48,7 +50,7 @@ const listSchema = {
 const List = mongoose.model("List", listSchema);
 
 
-  app.get("/list", function (req, res) {
+app.get("/list", function (req, res) {
     Item.find(function (err, foundItems) {
       if (foundItems.length === 0) {
         Item.insertMany(defaultItems, function (err) {
@@ -64,7 +66,7 @@ const List = mongoose.model("List", listSchema);
       res.render("list", { listTitle: "Today", newListItem: foundItems });
       }
     });
-   });
+  });
 
 
 app.post("/", function (req, res) {
@@ -115,8 +117,6 @@ const userSchema = new mongoose.Schema({
   list: [listSchema]
 });
 
-
-
 const User = new mongoose.model("User",userSchema);
 
 app.get("/", function(req,res){
@@ -135,13 +135,16 @@ app.get("/register", function(req,res){
   res.render("register");
 });
 
+app.get("/error", function(req,res){
+  res.render("error");
+});
+
 app.post("/register", function(req,res){
   const newUser = new User({
       username: req.body.fullname,
       email: req.body.username,
       password: md5(req.body.password),  
   });
-  console.log(newUser);
   newUser.save(function(err) {
       if(!err){
           res.redirect("/"+newUser.username);
@@ -153,16 +156,18 @@ app.post("/register", function(req,res){
 })
 
 app.post("/login", function(req,res){
-  const username = req.body.username;
-  const password = md5(req.body.password);
-  User.findOne({email: username}, function(err, foundUser){
+  const username = req.body.username; 
+  const password = md5(req.body.password);  
+  User.findOne({email: username}, function(err, foundUser){ 
       if(err){
           console.log(err);
-          
       }
       else{
           if(foundUser.password === password){
               res.redirect("/"+foundUser.username)
+          }
+          else{
+            res.render("error");
           }
       }
   });
@@ -176,9 +181,8 @@ app.get("/:page", function (req, res) {
         const list = new List({
           name: pageName,
           items: defaultItems
-        })
+        });
         list.save();
-        console.log(list);
         res.redirect("/"+pageName); 
       }
       else {
